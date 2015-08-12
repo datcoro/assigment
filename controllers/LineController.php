@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\LineForm;
+use app\models\Stations;
 use Yii;
 use yii\base\Exception;
 use yii\filters\AccessControl;
@@ -12,16 +14,21 @@ use yii\web\UploadedFile;
 
 class LineController extends Controller
 {
-     public function behaviors()
+    public function behaviors()
     {
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'only' => ['login', 'logout', 'create', 'edit', 'delete'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
                         'allow' => true,
+                        'actions' => ['login'],
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['logout', 'create', 'edit', 'delete'],
                         'roles' => ['@'],
                     ],
                 ],
@@ -34,7 +41,6 @@ class LineController extends Controller
             ],
         ];
     }
-
 
     public function actions()
     {
@@ -49,29 +55,61 @@ class LineController extends Controller
         ];
     }
 
-   public function actionIndex()
+    public function actionIndex()
     {
         $lst = Lines::find()
-            ->where([RECORD_STATUS => 0])
+            ->where([RECORD_STATUS => STATUS_NORMAL])
             ->orderBy(NAME)
             ->all();
+        $lstStation = [];
+        if(count($lst) > 0){
 
-        return $this->render('index', ['listLine' => $lst]);
+            foreach($lst as $item){
+                $stations = Stations::find()
+                        ->where([LINE_ID => $item->id, RECORD_STATUS =>STATUS_NORMAL])
+                        ->all();
+                if(count($stations) > 0)
+                    array_push($lstStation, ['line'=> $item, 'stations'=>$stations]);
+            }
+        }
+        return $this->render('index', ['listLine' => $lst, 'listStation' => $lstStation]);
     }
 
-     public function actionEdit($id)
+    public function actionCreate()
+    {
+        $model = new LineForm();
+        if ($model->load(Yii::$app->request->post())) {
+            $id = $model->create();
+            $imageName = "line_".$id;
+
+            $model->file = UploadedFile::getInstance($model, 'file');
+            $model->file->saveAs('uploads/'.$imageName.'.'.$model->file->extension);
+
+            $line = Lines::findOne($id);
+            $line->image = '@web/uploads/'.$imageName.'.'.$model->file->extension;
+            $line->save();
+
+            return $this->redirect('index');
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    public function actionEdit($id)
     {
         $model = Lines::findOne($id);
 
-    if ($model->load(Yii::$app->request->post())) {
+if ($model->load(Yii::$app->request->post())) {
             if($model->validate()){
 
                 $model->save();
                 $id = $model->id;
                 $model->file = UploadedFile::getInstance($model, 'file');
                 if($model->file){
-                     $model->file->saveAs('uploads/Lines_'.$model->id.'_'.getdate()[0] . '.' . $model->file->extension);
-                $model->image = '@web/uploads/Lines_'.$model->id.'_'.getdate()[0].'.'.$model->file->extension;
+                     $model->file->saveAs('uploads/line_'.$model->id.'_'.getdate()[0] . '.' . $model->file->extension);
+                $model->image = '@web/uploads/line_'.$model->id.'_'.getdate()[0].'.'.$model->file->extension;
                 $model->save();
                
                 }
@@ -85,29 +123,10 @@ class LineController extends Controller
         }
     }
 
-     public function actionCreate()
-    {
-        $model = new Lines();
-        if ($model->load(Yii::$app->request->post())) {
-            $imageName = $model->name;
-
-            $model->file = UploadedFile::getInstance($model, 'file');
-            $model->file->saveAs('uploads/'.$imageName.'.'.$model->file->extension);
-
-            $model->image = '@web/uploads/'.$imageName.'.'.$model->file->extension;
-            $model->save();
-
-            return $this->redirect('?r=line/index');
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-    }
-
     public function actionPreview($id)
     {
         $model = Lines::findOne($id);
+
 
         return $this->render('preview', [
             'model' => $model,
@@ -116,10 +135,11 @@ class LineController extends Controller
 
     public function actionDelete($id)
     {
+
         $model = Lines::findOne($id);
         if(!empty($model)){
-            $model->record_status  = 1;
-            if($model->save()) return $this->redirect('?r=line/index');
+            $model->record_status = STATUS_DELETED;
+            if($model->save()) return $this->redirect('../../line/index');
         }
     }
 

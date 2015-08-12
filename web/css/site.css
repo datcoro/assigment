@@ -2,9 +2,7 @@ html,
 body {
     height: 100%;
 }
-.img{
-    width: 120px;
-}
+
 .wrap {
     min-height: 100%;
     height: auto;

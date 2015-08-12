@@ -49,6 +49,8 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
+
+
         return $this->render('index');
     }
 
@@ -89,8 +91,9 @@ class SiteController extends Controller
         }
     }
 
-    public function actionAbout()
+    public function actionAbout($id)
     {
+        var_dump($id);die;
         return $this->render('about');
     }
 }

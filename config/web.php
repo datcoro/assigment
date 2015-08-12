@@ -3,13 +3,24 @@
 $params = require(__DIR__ . '/params.php');
 
 $config = [
-    'id' => 'basic',
+    'id' => 'yii2',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'components' => [
+        'urlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'rules' => [
+                'line/edit/<id:\d+>' => 'line/edit',
+                'line/delete/<id:\d+>' => 'line/delete',
+                'line/preview/<id:\d+>' => 'line/preview',
+                'station/create/<id:\d+>' => 'station/create',
+            ],
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => 'minhdt',
+            'cookieValidationKey' => 'thienth',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',

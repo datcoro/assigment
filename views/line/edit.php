@@ -12,19 +12,27 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-contact">
 
-    <h2>Line Update</h2>
+
     <div class="row">
         <div class="col-lg-5">
             <?php $form = ActiveForm::begin(['id' => 'line-form', 'options' => ['enctype' => 'multipart/form-data']]); ?>
             <?= $form->field($model, 'name') ?>
             <?= $form->field($model, 'description')->textarea() ?>
-            <?= $form->field($model, 'start_time')->textarea() ?>
+            <?= $form->field($model, 'start_time')->widget(\bootui\datetimepicker\Timepicker::className(),[
+                'options' => ['class' => 'form-control'],
+                'addon' => ['prepend' => 'Start time'],
+                'format' => 'HH:mm',
+            ]); ?>
 
-            <?= $form->field($model, 'end_time')->textarea() ?>
+            <?= $form->field($model, 'end_time')->widget(\bootui\datetimepicker\Timepicker::className(),[
+                'options' => ['class' => 'form-control'],
+                'addon' => ['prepend' => 'End Time'],
+                'format' => 'HH:mm',
+            ]); ?>
             <?= $form->field($model, 'file')->fileInput() ?>
 
             <div class="form-group">
-                <?= Html::submitButton('Update', ['class' => 'btn btn-primary', 'name' => 'contact-button']) ?>
+                <?= Html::submitButton('Submit', ['class' => 'btn btn-primary', 'name' => 'contact-button']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>

@@ -26,7 +26,7 @@ AppAsset::register($this);
     <div class="wrap">
         <?php
             NavBar::begin([
-                'brandLabel' => 'DTM DEMO',
+                'brandLabel' => 'VŨ TIẾN ĐẠT',
                 'brandUrl' => Yii::$app->homeUrl,
                 'options' => [
                     'class' => 'navbar-inverse navbar-fixed-top',
@@ -35,8 +35,16 @@ AppAsset::register($this);
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => [
-                    ['label' => 'Home', 'url' => ['/site/index']],
                     ['label' => 'Line Manage', 'url' => ['/line/index']],
+                    ['label' => 'Station Manage', 'url' => ['/station/index']],
+                    ['label' => 'Companies Manage', 'url' => ['/companies/index']],
+                    ['label' => 'Verhicle Manage', 'url' => ['/vehicles/index']],
+                    ['label' => 'User Manage', 'url' => ['/user/index']],
+                    Yii::$app->user->isGuest ?
+                        ['label' => 'Login', 'url' => ['/site/login']] :
+                        ['label' => 'Logout (' . Yii::$app->user->identity->username . ')',
+                            'url' => ['/site/logout'],
+                            'linkOptions' => ['data-method' => 'post']],
                 ],
             ]);
             NavBar::end();

@@ -14,6 +14,9 @@ use Yii;
  * @property string $end_time
  * @property string $image
  * @property integer $record_status
+ *
+ * @property Stations[] $stations
+ * @property Vehicles[] $vehicles
  */
 class Lines extends \yii\db\ActiveRecord
 {
@@ -52,8 +55,24 @@ class Lines extends \yii\db\ActiveRecord
             'start_time' => 'Start Time',
             'end_time' => 'End Time',
             'image' => 'Image',
-            'file' => 'Image',
             'record_status' => 'Record Status',
+            'file' => 'Image',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStations()
+    {
+        return $this->hasMany(Stations::className(), ['line_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVehicles()
+    {
+        return $this->hasMany(Vehicles::className(), ['line_id' => 'id']);
     }
 }
